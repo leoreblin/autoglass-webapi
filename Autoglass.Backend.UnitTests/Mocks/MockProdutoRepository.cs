@@ -13,16 +13,9 @@ namespace Autoglass.Backend.UnitTests.Mocks
     {
         public MockProdutoRepository() : base(MockBehavior.Strict) { }
 
-        public MockProdutoRepository MockGetAllProdutosByFiltroAsync(
-            long? produtoId,
-            long? fornecedorId,
-            string descricao,
-            bool? ativo,
-            DateTime? dataFabricacao,
-            DateTime? dataValidade,
-            List<ProdutoDto> output)
+        public MockProdutoRepository MockGetAllProdutosByFiltroAsync(string descricao, List<ProdutoDto> output)
         {
-            Setup(m => m.GetAllProdutosByFiltroAsync(produtoId, fornecedorId, descricao, ativo, dataFabricacao, dataValidade))
+            Setup(m => m.GetAllProdutosByFiltroAsync(descricao))
                 .ReturnsAsync(output);
 
             return this;

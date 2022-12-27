@@ -10,13 +10,7 @@ namespace Autoglass.Backend.Application.Produtos.Repositories
 {
     public interface IProdutoRepository : IBaseRepository<Produto>
     {
-        Task<List<ProdutoDto>> GetAllProdutosByFiltroAsync(
-            long? produtoId,
-            long? fornecedorId,
-            string descricao,
-            bool? ativo,
-            DateTime? dataFabricacao,
-            DateTime? dataValidade);
+        Task<List<ProdutoDto>> GetAllProdutosByFiltroAsync(string descricao);
 
         Task<ProdutoDto> GetProdutoByIdAsync(long produtoId);
     }

@@ -1,9 +1,11 @@
 ﻿using Autoglass.Backend.Application.Pagination;
 using Autoglass.Backend.Application.Produtos.Dto;
+using Autoglass.Backend.Core.Entities;
 using Autoglass.Backend.UnitTests.Mocks;
 using Autoglass.Backend.WebAPI.Controllers;
 using Autoglass.Backend.WebAPI.Models;
 using Bogus;
+using FizzWare.NBuilder;
 using FluentAssertions;
 using FluentResults;
 using Microsoft.AspNetCore.Http;
@@ -38,15 +40,7 @@ namespace Autoglass.Backend.UnitTests.WebAPI.Controllers
         public async Task Should_GetProdutos_ReturnOk()
         {
             // Arrange
-            var filtro = new RequestProdutosDto()
-            {
-                ProdutoId = null,
-                FornecedorId = 1,
-                Ativo = true,
-                DataFabricacao = null,
-                DataValidade = null,
-                DescricaoProduto = string.Empty
-            };
+            var filtroDescricao = string.Empty;
 
             var pagingParameters = new PagingParameters();
 
@@ -85,23 +79,10 @@ namespace Autoglass.Backend.UnitTests.WebAPI.Controllers
             };
 
             _mockProdutoRepository
-                .MockGetAllProdutosByFiltroAsync(filtro.ProdutoId,
-                filtro.FornecedorId,
-                filtro.DescricaoProduto,
-                filtro.Ativo,
-                filtro.DataFabricacao,
-                filtro.DataValidade, fakeProdutos);
+                .MockGetAllProdutosByFiltroAsync(filtroDescricao, fakeProdutos);
 
             // Act
-            var response = await _controller.GetProdutos(
-                filtro.ProdutoId,
-                filtro.FornecedorId,
-                filtro.DescricaoProduto,
-                filtro.Ativo,
-                filtro.DataFabricacao,
-                filtro.DataValidade,
-                pagingParameters.PageNumber,
-                pagingParameters.PageSize);
+            var response = await _controller.GetProdutos(filtroDescricao, pagingParameters.PageNumber, pagingParameters.PageSize);
 
             // Assert
             var result = response as ObjectResult;
@@ -115,15 +96,7 @@ namespace Autoglass.Backend.UnitTests.WebAPI.Controllers
         public async Task Should_GetProdutos_WithPagination_ReturnOk(int? pageNumber, int? pageSize)
         {
             // Arrange
-            var filtro = new RequestProdutosDto()
-            {
-                ProdutoId = null,
-                FornecedorId = 1,
-                Ativo = true,
-                DataFabricacao = null,
-                DataValidade = null,
-                DescricaoProduto = string.Empty
-            };
+            var filtroDescricao = string.Empty;
 
             var fakeProdutos = new Faker<ProdutoDto>()
                 .Rules((f, p) =>
@@ -139,23 +112,10 @@ namespace Autoglass.Backend.UnitTests.WebAPI.Controllers
                 .Generate(200);
 
             _mockProdutoRepository
-                .MockGetAllProdutosByFiltroAsync(filtro.ProdutoId,
-                filtro.FornecedorId,
-                filtro.DescricaoProduto,
-                filtro.Ativo,
-                filtro.DataFabricacao,
-                filtro.DataValidade, fakeProdutos);
+                .MockGetAllProdutosByFiltroAsync(filtroDescricao, fakeProdutos);
 
             // Act
-            var response = await _controller.GetProdutos(
-                filtro.ProdutoId,
-                filtro.FornecedorId,
-                filtro.DescricaoProduto,
-                filtro.Ativo,
-                filtro.DataFabricacao,
-                filtro.DataValidade,
-                pageNumber,
-                pageSize);
+            var response = await _controller.GetProdutos(filtroDescricao, pageNumber, pageSize);
 
             // Assert
             var result = response as ObjectResult;
@@ -168,35 +128,17 @@ namespace Autoglass.Backend.UnitTests.WebAPI.Controllers
         public async Task Should_GetProdutos_ReturnNotFound()
         {
             // Arrange
-            var filtro = new RequestProdutosDto()
-            {
-                ProdutoId = null,
-                FornecedorId = 1,
-                Ativo = true,
-                DataFabricacao = null,
-                DataValidade = null,
-                DescricaoProduto = string.Empty
-            };
+            var filtroDescricao = string.Empty;
 
             var pagingParameters = new PagingParameters();
 
             var fakeProdutos = new List<ProdutoDto>();
 
             _mockProdutoRepository
-                .MockGetAllProdutosByFiltroAsync(filtro.ProdutoId,
-                filtro.FornecedorId,
-                filtro.DescricaoProduto,
-                filtro.Ativo,
-                filtro.DataFabricacao,
-                filtro.DataValidade, fakeProdutos);
+                .MockGetAllProdutosByFiltroAsync(filtroDescricao, fakeProdutos);
 
             // Act
-            var response = await _controller.GetProdutos(filtro.ProdutoId,
-                filtro.FornecedorId,
-                filtro.DescricaoProduto,
-                filtro.Ativo,
-                filtro.DataFabricacao,
-                filtro.DataValidade, pagingParameters.PageNumber, pagingParameters.PageSize);
+            var response = await _controller.GetProdutos(filtroDescricao, pagingParameters.PageNumber, pagingParameters.PageSize);
 
             // Assert
             var result = response as ObjectResult;
@@ -259,6 +201,43 @@ namespace Autoglass.Backend.UnitTests.WebAPI.Controllers
 
             // Act
             var response = await _controller.CreateProduto(input);
+
+            // Assert
+            var result = response as OkResult;
+            result.StatusCode.Should().Be(StatusCodes.Status200OK);
+        }
+
+
+
+        [Fact]
+        public async Task Should_UpdateProduto_ReturnOk()
+        {
+            // Assert
+            long produtoId = 1234;
+
+            var input = new ProdutoInput
+            {
+                Ativo = true,
+                Descricao = "Novo produto",
+                DataFabricacao = DateTime.Now,
+                DataValidade = DateTime.Now.AddDays(1),
+                FornecedorId = 1
+            };
+
+            var produto = new Produto
+            {
+                Descricao = input.Descricao,
+                Ativo = input.Ativo,
+                DataFabricacao = input.DataFabricacao,
+                DataValidade = input.DataValidade,
+                FornecedorId = input.FornecedorId
+            };
+
+            _mapper.MockMap(input, produto);
+            _mockProdutoService.MockUpdateProdutoAsync(produto, Result.Ok());
+
+            // Act
+            var response = await _controller.UpdateProduto(produtoId, input);
 
             // Assert
             var result = response as OkResult;

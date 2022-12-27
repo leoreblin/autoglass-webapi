@@ -31,23 +31,9 @@ namespace Autoglass.Backend.WebAPI.Controllers
         }
 
         [HttpGet("api/v1/produtos")]
-        public async Task<IActionResult> GetProdutos(
-            long? produtoId,
-            long? fornecedorId,
-            string descricao,
-            bool? ativo,
-            DateTime? dataFabricacao,
-            DateTime? dataValidade,
-            int? pageNumber,
-            int? pageSize)
+        public async Task<IActionResult> GetProdutos(string filtroDescricao, int? pageNumber, int? pageSize)
         {
-            var produtos = await _produtoRepository.GetAllProdutosByFiltroAsync(
-                produtoId,
-                fornecedorId,
-                descricao,
-                ativo,
-                dataFabricacao,
-                dataValidade);
+            var produtos = await _produtoRepository.GetAllProdutosByFiltroAsync(filtroDescricao);
 
             if (produtos?.Count == 0)
             {

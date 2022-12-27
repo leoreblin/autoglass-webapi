@@ -4,7 +4,6 @@ using Autoglass.Backend.Application.Produtos.Repositories;
 using Autoglass.Backend.Application.Produtos.Services.Interfaces;
 using Autoglass.Backend.Core.Entities;
 using FluentResults;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Autoglass.Backend.Application.Produtos.Services

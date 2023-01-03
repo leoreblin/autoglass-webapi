@@ -35,7 +35,7 @@ namespace Autoglass.Backend.Application.Produtos.Services
                 return Result.Fail(new Error("Não existe fornecedor com o código informado."));
             }
 
-            Produto produto = MapFromDto(dto);
+            Produto produto = dto;
 
             await _produtoRepository.AddAsync(produto);
             return Result.Ok();
@@ -58,18 +58,6 @@ namespace Autoglass.Backend.Application.Produtos.Services
             await _produtoRepository.UpdateAsync(produto);
 
             return Result.Ok();
-        }
-
-        private static Produto MapFromDto(ProdutoInputDto dto)
-        {
-            return new Produto
-            {
-                Descricao = dto.Descricao,
-                Ativo = dto.Ativo,
-                FornecedorId = dto.FornecedorId,
-                DataFabricacao = dto.DataFabricacao,
-                DataValidade = dto.DataValidade
-            };
         }
     }
 }
